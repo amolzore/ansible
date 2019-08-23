@@ -1,0 +1,42 @@
+[root@ip-172-31-26-25 ansibal]# vi docker_centos.yml
+---
+
+- hosts: syn
+
+  tasks:
+
+
+    - name: Install device mapper persistent data
+      yum:
+        name:
+          - yum-utils
+          - device-mapper-persistent-data
+          - lvm2
+        state: present
+
+    - name: Setting up docker repo
+      get_url:
+        url: https://download.docker.com/linux/centos/docker-ce.repo
+        dest: /etc/yum.repos.d/docker-ce.repo
+
+    - name: Installing docker
+      yum:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: present
+
+    - name: Starting docker
+      service:
+        name: docker
+        state: started
+
+    - name: Installing jenkins
+      copy:
+        src: start-jenkins.sh
+        dest: /opt
+        mode: 755
+
+    - name: Starting Jenkins
+      command: /opt/start-jenkins.sh
